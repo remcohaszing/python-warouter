@@ -7,6 +7,8 @@ Warouter is a simple routing wrapper around webapp2_.
 Installing
 ----------
 
+::
+
     $ pip install warouter
 
 
