@@ -123,8 +123,6 @@ class WSGIApplicationMixin(object):
                 processed.append(webapp2.Route(m.url, m, name=m.url))
             else:
                 processed.append(m)
-        print(handlers)
-        print(processed)
         super(WSGIApplicationMixin, self).__init__(processed, *args, **kwargs)
 
 
