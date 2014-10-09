@@ -154,6 +154,8 @@ def uri_for(handler, *args, **kwargs):
         handler (webapp2.RequestHandler): The handler for which to find a url.
             If this is a string, it will be tried to import a handler
             from this string.
+        args: passed to :func:`webapp2.uri_for`.
+        kwargs: passed to :func:`webapp2.uri_for`.
 
     Returns:
         basestring: A string containing the url for the handler.
