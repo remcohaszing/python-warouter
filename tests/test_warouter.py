@@ -21,7 +21,7 @@ class UrlTest(unittest.TestCase):
 
     """
     def setUp(self):
-        warouter._mapping.clear()
+        warouter._handlers.clear()
 
     def test_root_handler_slash_url(self):
         """
@@ -122,7 +122,7 @@ class WSGIApplicationTest(unittest.TestCase):
 
     """
     def setUp(self):
-        warouter._mapping.clear()
+        warouter._handlers.clear()
 
     def test_auto_add_mapping(self):
         """
@@ -201,7 +201,7 @@ class UriForTest(unittest.TestCase):
 
     """
     def setUp(self):
-        warouter._mapping.clear()
+        warouter._handlers.clear()
 
     def test_find_for_handler(self):
         """

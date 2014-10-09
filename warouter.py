@@ -70,7 +70,7 @@ import pydoc
 import webapp2
 
 
-_mapping = {}
+_handlers = set()
 
 
 def url(url):
@@ -103,7 +103,7 @@ def url(url):
                         setattr(handler, method, None)
                 except AttributeError:
                     pass
-        _mapping[full_url] = handler
+        _handlers.add(handler)
         handler.url = full_url
         return handler
     return inner
@@ -126,10 +126,9 @@ class WSGIApplicationMixin(object):
     warouter_logging_format = '{0} → {1.__module__}.{1.__name__}'
 
     def __init__(self, mapping, *args, **kwargs):
-        handlers = _mapping.values()
         processed = []
         for m in mapping:
-            if m in handlers:
+            if m in _handlers:
                 self.warouter_logger.log(
                     self.warouter_logging_level,
                     self.warouter_logging_format.format(m.url, m))
