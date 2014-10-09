@@ -6,8 +6,10 @@ This module contains tests for :mod:`warouter`.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import logging
 import unittest
 
+import mock
 import webapp2
 
 import warouter
@@ -136,6 +138,61 @@ class WSGIApplicationTest(unittest.TestCase):
         self.assertEqual('/', route.template)
         self.assertEqual('/', route.name)
         self.assertIs(RootHandler, route.handler)
+
+    def test_logger(self):
+        """
+        Test that logging is called with the appropriate logging level.
+
+        """
+        @warouter.url('/')
+        class RootHandler(webapp2.RequestHandler):
+            pass
+
+        class WSGIApplication(warouter.WSGIApplication):
+            warouter_logger = mock.Mock()
+
+        WSGIApplication([RootHandler])
+        WSGIApplication.warouter_logger.log.assert_called_once_with(
+            logging.NOTSET, '/ → tests.test_warouter.RootHandler')
+
+    @mock.patch('logging.log')
+    def test_logging_level(self, log):
+        """
+        Test that logging is called with the appropriate logging level.
+
+        """
+        @warouter.url('/')
+        class RootHandler(webapp2.RequestHandler):
+            pass
+
+        warouter.WSGIApplication([RootHandler])
+        log.assert_called_once_with(logging.NOTSET,
+                                    '/ → tests.test_warouter.RootHandler')
+
+        log.reset_mock()
+
+        class InfoWSGIApplication(warouter.WSGIApplication):
+            warouter_logging_level = logging.INFO
+
+        InfoWSGIApplication([RootHandler])
+        log.assert_called_once_with(logging.INFO,
+                                    '/ → tests.test_warouter.RootHandler')
+
+    @mock.patch('logging.log')
+    def test_logging_format(self, log):
+        """
+        Test that a custom logging format is respected.
+
+        """
+        @warouter.url('/')
+        class RootHandler(webapp2.RequestHandler):
+            pass
+
+        class WSGIApplication(warouter.WSGIApplication):
+            warouter_logging_format = 'SPAM'
+
+        WSGIApplication([RootHandler])
+        log.assert_called_once_with(logging.NOTSET, 'SPAM')
 
 
 class UriForTest(unittest.TestCase):

@@ -64,6 +64,7 @@ The above example requires Paste_, which can be installed using::
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import logging
 import pydoc
 
 import webapp2
@@ -115,11 +116,23 @@ class WSGIApplicationMixin(object):
     :class:`webapp2.Route` objects or tuples.
 
     """
+    #: The logger to use when logging. May be overridden by subclasses.
+    warouter_logger = logging
+    #: logging level at which to log the handler mapping. May be
+    #: overridden by subclasses.
+    warouter_logging_level = logging.NOTSET
+    #: String format to log. fill be formatted with the url and handler.
+    #: May be overridden by subclasses.
+    warouter_logging_format = '{0} → {1.__module__}.{1.__name__}'
+
     def __init__(self, mapping, *args, **kwargs):
         handlers = _mapping.values()
         processed = []
         for m in mapping:
             if m in handlers:
+                self.warouter_logger.log(
+                    self.warouter_logging_level,
+                    self.warouter_logging_format.format(m.url, m))
                 processed.append(webapp2.Route(m.url, m, name=m.url))
             else:
                 processed.append(m)

@@ -22,5 +22,8 @@ setup(
         'webapp2',
         'webob'
     ],
+    tests_require=[
+        'mock'
+    ],
     test_suite='tests',
     zip_safe=True)
