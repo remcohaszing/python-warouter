@@ -8,6 +8,10 @@ with open('README.rst') as f:
     readme = f.read()
 
 
+with open('docs.txt') as f:
+    docs_require = f.readlines()
+
+
 setup(
     name='warouter',
     version='0.0.3',
@@ -25,5 +29,8 @@ setup(
     tests_require=[
         'mock'
     ],
+    extras_require={
+        'docs': docs_require
+    },
     test_suite='tests',
     zip_safe=True)
