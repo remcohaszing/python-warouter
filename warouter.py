@@ -80,6 +80,9 @@ def url(url):
     This decorator specifies a url for a handler by appending it to the
     url of its parent handlers.
 
+    Args:
+        url (basestring): The url to append to the decorated handler.
+
     """
     def inner(handler):
         handler._appended_url = url
