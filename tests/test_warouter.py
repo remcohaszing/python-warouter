@@ -115,6 +115,48 @@ class UrlTest(unittest.TestCase):
         self.assertIsNone(ChildHandler.get)
         self.assertIsNot(ChildHandler.post.im_func, RootHandler.post.im_func)
 
+    def test_param_conversion(self):
+        """
+        Test whether types are converted conforming the param mapping.
+
+        """
+        number_mock = mock.Mock()
+        boolean_mock = mock.Mock()
+
+        @warouter.url('/<number>/<boolean>', number=int, boolean=bool)
+        class RootHandler(webapp2.RequestHandler):
+            def get(self, number, boolean):
+                number_mock(number)
+                boolean_mock(boolean)
+
+        warouter.WSGIApplication([RootHandler]).get_response('/42/1')
+
+        number_mock.assert_called_once_with(42)
+        boolean_mock.assert_called_once_with(True)
+
+    def test_param_conversion_subclass(self):
+        """
+        Make sure types are converted conforming the param mapping in subclass.
+
+        """
+        number_mock = mock.Mock()
+        boolean_mock = mock.Mock()
+
+        @warouter.url(r'/<number>', boolean=bool)
+        class RootHandler(webapp2.RequestHandler):
+            pass
+
+        @warouter.url(r'/<boolean>', number=int)
+        class ChildHandler(RootHandler):
+            def get(self, number, boolean):
+                number_mock(number)
+                boolean_mock(boolean)
+
+        warouter.WSGIApplication([ChildHandler]).get_response('/42/1')
+
+        number_mock.assert_called_once_with(42)
+        boolean_mock.assert_called_once_with(True)
+
 
 class WSGIApplicationTest(unittest.TestCase):
     """

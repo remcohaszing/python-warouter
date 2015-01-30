@@ -64,6 +64,7 @@ The above example requires Paste_, which can be installed using::
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import functools
 import logging
 import pydoc
 
@@ -73,19 +74,43 @@ import webapp2
 _handlers = set()
 
 
-def url(url):
+def url(url, **param_mapping):
     """
     Specifies a url for a :class:`webapp2.RequestHandler`.
 
     This decorator specifies a url for a handler by appending it to the
     url of its parent handlers.
 
+    A param mapping may be specified as keyword arguments. the url
+    parameters will be matched against these values and be converted by
+    the callable specified as the kwarg value.
+
     Args:
         url (basestring): The url to append to the decorated handler.
+        **param_mapping: A dict of key, value pairs where the key
+            specifies the name of a url parameter to vonvert and the
+            value a callable used to convert the url parameter.
 
     """
     def inner(handler):
         handler._appended_url = url
+        if param_mapping:
+            if hasattr(handler, '_param_mapping'):
+                handler._param_mapping = handler._param_mapping.copy()
+                handler._param_mapping.update(param_mapping)
+            else:
+                handler._param_mapping = param_mapping.copy()
+
+        def fn_wrapper(fn):
+            @functools.wraps(fn)
+            def fn_inner(*args, **kwargs):
+                for key, value in kwargs.iteritems():
+                    if key in handler._param_mapping:
+                        kwargs[key] = handler._param_mapping[key](value)
+                return fn(*args, **kwargs)
+
+            return fn_inner
+
         full_url = ''
         for base in reversed(handler.mro()):
             try:
@@ -106,6 +131,13 @@ def url(url):
                         setattr(handler, method, None)
                 except AttributeError:
                     pass
+
+        for method in webapp2.WSGIApplication.allowed_methods:
+            method = method.lower()
+            try:
+                setattr(handler, method, fn_wrapper(getattr(handler, method)))
+            except AttributeError:
+                pass
         _handlers.add(handler)
         handler.url = full_url
         return handler
