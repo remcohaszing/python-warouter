@@ -14,7 +14,7 @@ with open('docs.txt') as f:
 
 setup(
     name='warouter',
-    version='0.0.3',
+    version='0.1.0',
     author='Remco Haszing',
     author_email='remcohaszing@gmail.com',
     url='https://github.com/remcohaszing/python-warouter',
