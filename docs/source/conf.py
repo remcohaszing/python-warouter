@@ -1,8 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-import sys
-import os
-
 import pkg_resources
 
 project = htmlhelp_basename = 'warouter'
