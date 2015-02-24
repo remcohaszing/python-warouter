@@ -104,9 +104,10 @@ def url(url, **param_mapping):
         def fn_wrapper(fn):
             @functools.wraps(fn)
             def fn_inner(*args, **kwargs):
-                for key, value in kwargs.iteritems():
-                    if key in handler._param_mapping:
-                        kwargs[key] = handler._param_mapping[key](value)
+                if hasattr(handler, '_param_mapping'):
+                    for key, value in kwargs.iteritems():
+                        if key in handler._param_mapping:
+                            kwargs[key] = handler._param_mapping[key](value)
                 return fn(*args, **kwargs)
 
             return fn_inner

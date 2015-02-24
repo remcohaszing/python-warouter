@@ -115,6 +115,21 @@ class UrlTest(unittest.TestCase):
         self.assertIsNone(ChildHandler.get)
         self.assertIsNot(ChildHandler.post.im_func, RootHandler.post.im_func)
 
+    def test_request_without_conversion(self):
+        """
+        Test whether requests can be made withou conversion.
+
+        """
+        m = mock.Mock()
+
+        @warouter.url('/<param>')
+        class RootHandler(webapp2.RequestHandler):
+            def get(self, param):
+                m(param)
+
+        warouter.WSGIApplication([RootHandler]).get_response('/spam')
+        m.assert_called_once_with('spam')
+
     def test_param_conversion(self):
         """
         Test whether types are converted conforming the param mapping.
